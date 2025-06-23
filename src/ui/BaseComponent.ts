@@ -1,6 +1,6 @@
 import { UIComponent } from './UIManager';
 import { Building } from '../components/building/Building';
-import { BaseSystem } from '../core/BaseSystem';
+import { BuildingManager } from '../components/building/BuildingManager';
 import { CentralStateManager } from '../core/CentralStateManager';
 import { EventBus, GameEvents } from '../core/EventBus';
 import type { BuildingType } from '../components/building/types';
@@ -8,7 +8,7 @@ import { DataManager } from '../utils/DataManager';
 
 export class BaseComponent implements UIComponent {
   element: HTMLElement;
-  private baseSystem: BaseSystem | null = null;
+  private buildingManager: BuildingManager | null = null;
   private eventBus: EventBus;
 
   constructor(element: HTMLElement) {
@@ -17,8 +17,8 @@ export class BaseComponent implements UIComponent {
   }
 
   initialize(): void {
-    const gameManager = GameManager.getInstance();
-    this.baseSystem = gameManager.getSystem<BaseSystem>('base') || null;
+    const centralStateManager = CentralStateManager.getInstance();
+    this.buildingManager = centralStateManager.getSystem('building') as unknown as BuildingManager || null;
     
     this.render();
     this.setupEventListeners();
@@ -56,8 +56,8 @@ export class BaseComponent implements UIComponent {
     const statusBtn = document.getElementById('base-status-btn');
     if (statusBtn) {
       statusBtn.addEventListener('click', () => {
-        if (this.baseSystem) {
-          this.baseSystem.printBaseStatus();
+        if (this.buildingManager) {
+          this.buildingManager.printBaseStatus();
         }
       });
     }
@@ -91,7 +91,7 @@ export class BaseComponent implements UIComponent {
         event.stopPropagation();
         const buildingType = target.getAttribute('data-building-type') as BuildingType;
         
-        if (buildingType && this.baseSystem) {
+        if (buildingType && this.buildingManager) {
           this.buildBuilding(buildingType);
         }
       }
@@ -100,7 +100,7 @@ export class BaseComponent implements UIComponent {
         event.stopPropagation();
         const buildingId = target.getAttribute('data-building-id');
         
-        if (buildingId && this.baseSystem) {
+        if (buildingId && this.buildingManager) {
           this.upgradeBuilding(buildingId);
         }
       }
@@ -109,7 +109,7 @@ export class BaseComponent implements UIComponent {
         event.stopPropagation();
         const buildingId = target.getAttribute('data-building-id');
         
-        if (buildingId && this.baseSystem) {
+        if (buildingId && this.buildingManager) {
           this.collectProduction(buildingId);
         }
       }
@@ -118,7 +118,7 @@ export class BaseComponent implements UIComponent {
         event.stopPropagation();
         const buildingId = target.getAttribute('data-building-id');
         
-        if (buildingId && this.baseSystem && confirm('本当に解体しますか？')) {
+        if (buildingId && this.buildingManager && confirm('本当に解体しますか？')) {
           this.demolishBuilding(buildingId);
         }
       }
@@ -126,7 +126,7 @@ export class BaseComponent implements UIComponent {
   }
 
   update(): void {
-    if (!this.baseSystem) return;
+    if (!this.buildingManager) return;
 
     this.updateBuildingsList();
     this.updateConstructionGrid();
@@ -134,9 +134,9 @@ export class BaseComponent implements UIComponent {
 
   private updateBuildingsList(): void {
     const container = document.getElementById('buildings-container');
-    if (!container || !this.baseSystem) return;
+    if (!container || !this.buildingManager) return;
 
-    const buildings = this.baseSystem.getAllBuildings();
+    const buildings = this.buildingManager.getAllBuildings();
     
     container.innerHTML = buildings.map(building => 
       this.renderBuildingCard(building)
@@ -256,20 +256,20 @@ export class BaseComponent implements UIComponent {
   }
 
   private canAffordCost(cost: any): boolean {
-    const gameState = GameState.getInstance();
-    if (!gameState) return false;
+    const centralStateManager = CentralStateManager.getInstance();
+    if (!centralStateManager) return false;
 
     return Object.entries(cost).every(([resource, amount]) => {
-      return amount ? gameState.hasResource(resource, amount as number) : true;
+      return amount ? centralStateManager.hasResource(resource, amount as number) : true;
     });
   }
 
   // アクションメソッド
   private buildBuilding(type: BuildingType): void {
-    if (!this.baseSystem) return;
+    if (!this.buildingManager) return;
 
     // 簡単な位置決定（次の空いている位置を使用）
-    const buildings = this.baseSystem.getAllBuildings();
+    const buildings = this.buildingManager.getAllBuildings();
     const usedPositions = new Set(buildings.map(b => `${b.position.x},${b.position.y}`));
     
     let position = { x: 0, y: 0 };
@@ -283,7 +283,7 @@ export class BaseComponent implements UIComponent {
       if (position.x !== 0 || position.y !== 0) break;
     }
 
-    const result = this.baseSystem.buildBuilding(type, position);
+    const result = this.buildingManager.buildBuilding(type, position);
     
     if (result.success) {
       console.log(result.message);
@@ -293,9 +293,9 @@ export class BaseComponent implements UIComponent {
   }
 
   private upgradeBuilding(buildingId: string): void {
-    if (!this.baseSystem) return;
+    if (!this.buildingManager) return;
 
-    const result = this.baseSystem.upgradeBuilding(buildingId);
+    const result = this.buildingManager.upgradeBuilding(buildingId);
     
     if (result.success) {
       console.log(result.message);
@@ -305,9 +305,9 @@ export class BaseComponent implements UIComponent {
   }
 
   private collectProduction(buildingId: string): void {
-    if (!this.baseSystem) return;
+    if (!this.buildingManager) return;
 
-    const result = this.baseSystem.collectBuildingProduction(buildingId);
+    const result = this.buildingManager.collectBuildingProduction(buildingId);
     
     if (result.success && result.result) {
       console.log(`${result.result.resourceType} +${Math.floor(result.result.amount)} を回収しました`);
@@ -315,9 +315,9 @@ export class BaseComponent implements UIComponent {
   }
 
   private demolishBuilding(buildingId: string): void {
-    if (!this.baseSystem) return;
+    if (!this.buildingManager) return;
 
-    const result = this.baseSystem.demolishBuilding(buildingId);
+    const result = this.buildingManager.demolishBuilding(buildingId);
     
     if (result.success) {
       console.log(result.message);

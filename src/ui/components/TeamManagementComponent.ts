@@ -1,9 +1,9 @@
-import { UIComponent } from '@ui/UIManager';
-import { Character } from '@entities/Character';
-import { CharacterSystem } from '@systems/CharacterSystem';
-import { TeamWorkSystem } from '@systems/TeamWorkSystem';
-import { GameManager } from '@core/GameManager';
-import { EventBus, GameEvents } from '@core/EventBus';
+import { UIComponent } from '../UIManager';
+import { Character } from '../../components/character/Character';
+import { CharacterSystem } from '../../components/character/CharacterSystem';
+import { TeamWorkSystem } from '../../components/team/TeamSystem';
+import { CentralStateManager } from '../../core/CentralStateManager';
+import { EventBus, GameEvents } from '../../core/EventBus';
 
 export interface Team {
   id: string;
@@ -21,7 +21,6 @@ export class TeamManagementComponent implements UIComponent {
   private teams: Map<string, Team> = new Map();
   private draggedCharacter: Character | null = null;
   private maxTeams = 4;
-  private maxMembersPerTeam = 6;
 
   constructor(element: HTMLElement) {
     this.element = element;
@@ -30,9 +29,9 @@ export class TeamManagementComponent implements UIComponent {
   }
 
   initialize(): void {
-    const gameManager = GameManager.getInstance();
-    this.characterSystem = gameManager.getSystem<CharacterSystem>('character') || null;
-    this.teamWorkSystem = gameManager.getSystem<TeamWorkSystem>('teamwork') || null;
+    const centralStateManager = CentralStateManager.getInstance();
+    this.characterSystem = centralStateManager.getSystem<CharacterSystem>('character') || null;
+    this.teamWorkSystem = centralStateManager.getSystem<TeamWorkSystem>('team') || null;
     
     this.render();
     this.setupEventListeners();
@@ -53,46 +52,8 @@ export class TeamManagementComponent implements UIComponent {
   private render(): void {
     this.element.innerHTML = `
       <div class="team-management">
-        <div class="team-management__header">
-          <h2>チーム管理</h2>
-          <div class="team-management__controls">
-            <button class="btn btn--primary" id="assign-all-tasks">
-              全チームに作業割当
-            </button>
-            <button class="btn btn--secondary" id="clear-all-teams">
-              全チーム解散
-            </button>
-          </div>
-        </div>
-        
         <div class="teams-grid" id="teams-container">
           ${Array.from(this.teams.values()).map(team => this.renderTeamSlot(team)).join('')}
-        </div>
-        
-        <div class="team-management__task-assignment">
-          <h3>作業割当</h3>
-          <div class="task-categories">
-            <div class="task-category">
-              <h4>🍳 料理</h4>
-              <button class="task-btn" data-task="cooking-bread">パン作り</button>
-              <button class="task-btn" data-task="cooking-stew">シチュー作り</button>
-            </div>
-            <div class="task-category">
-              <h4>⚔️ 戦闘</h4>
-              <button class="task-btn" data-task="combat-patrol">パトロール</button>
-              <button class="task-btn" data-task="combat-hunt">狩り</button>
-            </div>
-            <div class="task-category">
-              <h4>🔍 探索</h4>
-              <button class="task-btn" data-task="exploration-forest">森の探索</button>
-              <button class="task-btn" data-task="exploration-cave">洞窟探索</button>
-            </div>
-            <div class="task-category">
-              <h4>🏗️ 建設</h4>
-              <button class="task-btn" data-task="building-upgrade">建物強化</button>
-              <button class="task-btn" data-task="building-repair">修理</button>
-            </div>
-          </div>
         </div>
       </div>
     `;
@@ -104,8 +65,14 @@ export class TeamManagementComponent implements UIComponent {
     return `
       <div class="team-slot" data-team-id="${team.id}">
         <div class="team-slot__header">
-          <input type="text" class="team-name-input" value="${team.name}" data-team-id="${team.id}">
-          <span class="team-member-count">${team.members.length}/${this.maxMembersPerTeam}</span>
+          <input type="text" 
+                 id="team-name-${team.id}" 
+                 name="team-name-${team.id}" 
+                 class="team-name-input" 
+                 value="${team.name}" 
+                 data-team-id="${team.id}"
+                 autocomplete="off">
+          <span class="team-member-count">${team.members.length}人</span>
         </div>
         
         <div class="team-slot__drop-zone ${isEmpty ? 'empty' : ''}" 
@@ -130,7 +97,10 @@ export class TeamManagementComponent implements UIComponent {
               </div>
               <button class="btn btn--xs btn--danger stop-task-btn" data-team-id="${team.id}">停止</button>
             </div>` :
-            `<div class="team-idle">待機中</div>`
+            `<div class="team-idle">
+              <span>待機中</span>
+              <button class="btn btn--xs btn--primary assign-task-btn" data-team-id="${team.id}">作業割当</button>
+            </div>`
           }
         </div>
       </div>
@@ -175,14 +145,15 @@ export class TeamManagementComponent implements UIComponent {
     // ドラッグ＆ドロップイベント
     this.setupDragAndDrop();
 
-    // タスク割当ボタン
+    // ボタンクリックイベント
     this.element.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       
-      if (target.classList.contains('task-btn')) {
-        const taskType = target.getAttribute('data-task');
-        if (taskType) {
-          this.showTaskAssignmentModal(taskType);
+      // 作業割当ボタン
+      if (target.classList.contains('assign-task-btn')) {
+        const teamId = target.getAttribute('data-team-id');
+        if (teamId) {
+          this.showTaskSelectionModal(teamId);
         }
       }
       
@@ -204,17 +175,6 @@ export class TeamManagementComponent implements UIComponent {
       }
     });
 
-    // 全チーム操作
-    const assignAllBtn = document.getElementById('assign-all-tasks');
-    const clearAllBtn = document.getElementById('clear-all-teams');
-    
-    if (assignAllBtn) {
-      assignAllBtn.addEventListener('click', () => this.assignTasksToAllTeams());
-    }
-    
-    if (clearAllBtn) {
-      clearAllBtn.addEventListener('click', () => this.clearAllTeams());
-    }
 
     // キャラクター関連イベント
     this.eventBus.on(GameEvents.CHARACTER_SPAWN, () => {
@@ -258,9 +218,11 @@ export class TeamManagementComponent implements UIComponent {
       if (dropZone) {
         dropZone.classList.remove('drag-over');
         const teamId = dropZone.getAttribute('data-team-id');
-        if (teamId && this.draggedCharacter) {
-          this.addCharacterToTeam(this.draggedCharacter, teamId);
+        const draggedCharacter = this.draggedCharacter || (window as any).draggedCharacter;
+        if (teamId && draggedCharacter) {
+          this.addCharacterToTeam(draggedCharacter, teamId);
           this.draggedCharacter = null;
+          (window as any).draggedCharacter = null;
         }
       }
     });
@@ -284,11 +246,6 @@ export class TeamManagementComponent implements UIComponent {
     // 既に他のチームにいる場合は削除
     this.removeCharacterFromAllTeams(character.id);
 
-    // チームサイズ制限チェック
-    if (team.members.length >= this.maxMembersPerTeam) {
-      console.warn(`Team ${team.name} is full`);
-      return;
-    }
 
     team.members.push(character);
     this.update();
@@ -308,30 +265,73 @@ export class TeamManagementComponent implements UIComponent {
     });
   }
 
-  private showTaskAssignmentModal(taskType: string): void {
-    // 簡単なプロンプトで実装（後で改善可能）
-    const availableTeams = Array.from(this.teams.values())
-      .filter(team => team.members.length > 0 && !team.currentTask);
-    
-    if (availableTeams.length === 0) {
-      alert('利用可能なチームがありません');
+  private showTaskSelectionModal(teamId: string): void {
+    const team = this.teams.get(teamId);
+    if (!team || team.members.length === 0) {
+      alert('チームにキャラクターがいません');
       return;
     }
 
-    const teamOptions = availableTeams.map((team, index) => 
-      `${index + 1}. ${team.name} (${team.members.length}人)`
-    ).join('\n');
-    
-    const selectedIndex = prompt(
-      `${this.getTaskDisplayName(taskType)}を割り当てるチームを選択してください:\n\n${teamOptions}\n\n番号を入力:`
-    );
-    
-    if (selectedIndex) {
-      const index = parseInt(selectedIndex) - 1;
-      if (index >= 0 && index < availableTeams.length) {
-        this.assignTaskToTeam(availableTeams[index].id, taskType);
+    // タスク選択モーダルを作成
+    const modal = document.createElement('div');
+    modal.className = 'task-selection-modal';
+    modal.innerHTML = `
+      <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>${team.name} - 作業選択</h3>
+            <button class="modal-close" id="modal-close">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="task-categories-modal">
+              <div class="task-category-modal">
+                <h4>🍳 料理</h4>
+                <button class="task-btn-modal" data-task="cooking-bread">パン作り</button>
+                <button class="task-btn-modal" data-task="cooking-stew">シチュー作り</button>
+              </div>
+              <div class="task-category-modal">
+                <h4>⚔️ 戦闘</h4>
+                <button class="task-btn-modal" data-task="combat-patrol">パトロール</button>
+                <button class="task-btn-modal" data-task="combat-hunt">狩り</button>
+              </div>
+              <div class="task-category-modal">
+                <h4>🔍 探索</h4>
+                <button class="task-btn-modal" data-task="exploration-forest">森の探索</button>
+                <button class="task-btn-modal" data-task="exploration-cave">洞窟探索</button>
+              </div>
+              <div class="task-category-modal">
+                <h4>🏗️ 建設</h4>
+                <button class="task-btn-modal" data-task="building-upgrade">建物強化</button>
+                <button class="task-btn-modal" data-task="building-repair">修理</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // モーダルイベントリスナー
+    const closeModal = () => {
+      document.body.removeChild(modal);
+    };
+
+    modal.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      
+      if (target.id === 'modal-overlay' || target.id === 'modal-close') {
+        closeModal();
       }
-    }
+      
+      if (target.classList.contains('task-btn-modal')) {
+        const taskType = target.getAttribute('data-task');
+        if (taskType) {
+          this.assignTaskToTeam(teamId, taskType);
+          closeModal();
+        }
+      }
+    });
   }
 
   private assignTaskToTeam(teamId: string, taskType: string): void {
@@ -445,29 +445,6 @@ export class TeamManagementComponent implements UIComponent {
     return taskNames[taskType] || taskType;
   }
 
-  private assignTasksToAllTeams(): void {
-    // 全チームに適当なタスクを割り当て
-    const availableTasks = ['cooking-bread', 'combat-patrol', 'exploration-forest'];
-    
-    this.teams.forEach(team => {
-      if (team.members.length > 0 && !team.currentTask) {
-        const randomTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
-        this.assignTaskToTeam(team.id, randomTask);
-      }
-    });
-  }
-
-  private clearAllTeams(): void {
-    this.teams.forEach(team => {
-      if (team.currentTask && this.teamWorkSystem) {
-        this.teamWorkSystem.stopTeamTask(team.id);
-      }
-      team.members = [];
-      team.currentTask = undefined;
-      team.taskProgress = 0;
-    });
-    this.update();
-  }
 
   private updateTeamTaskProgressFromEvent(activeTeamTasks: any[]): void {
     activeTeamTasks.forEach(taskData => {

@@ -8,6 +8,7 @@ export class MainScreenComponent implements UIComponent {
   private teamManagement: TeamManagementComponent | null = null;
   private characterList: CharacterListComponent | null = null;
   private eventBus: EventBus;
+  private currentTab: string = 'team';
 
   constructor(element: HTMLElement) {
     this.element = element;
@@ -23,13 +24,72 @@ export class MainScreenComponent implements UIComponent {
   private render(): void {
     this.element.innerHTML = `
       <div class="main-screen">
-        <div class="main-screen__teams" id="team-management-container">
-          <!-- チーム管理コンポーネントがここに配置される -->
+        <div class="main-screen__content">
+          <div class="content-view ${this.currentTab === 'team' ? 'active' : ''}" id="team-view">
+            <div id="team-management-container"></div>
+            <div id="character-list-container"></div>
+          </div>
+          
+          <div class="content-view ${this.currentTab === 'base' ? 'active' : ''}" id="base-view">
+            <div id="base-building-container">
+              <h3>拠点建設</h3>
+              <div class="building-grid">
+                <div class="building-card">
+                  <h4>🏠 住居</h4>
+                  <p>キャラクターの住む場所</p>
+                  <button class="btn btn--primary build-btn" data-building="house">建設</button>
+                </div>
+                <div class="building-card">
+                  <h4>🍳 キッチン</h4>
+                  <p>料理を作る場所</p>
+                  <button class="btn btn--primary build-btn" data-building="kitchen">建設</button>
+                </div>
+                <div class="building-card">
+                  <h4>🔨 工房</h4>
+                  <p>道具を作る場所</p>
+                  <button class="btn btn--primary build-btn" data-building="workshop">建設</button>
+                </div>
+                <div class="building-card">
+                  <h4>🏥 医務室</h4>
+                  <p>怪我や病気を治す場所</p>
+                  <button class="btn btn--primary build-btn" data-building="clinic">建設</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-view ${this.currentTab === 'item' ? 'active' : ''}" id="item-view">
+            <div id="item-container">
+              <h3>アイテム</h3>
+              <div class="item-categories">
+                <div class="item-category">
+                  <h4>🎒 インベントリ</h4>
+                  <p>所持しているアイテムの管理</p>
+                </div>
+                <div class="item-category">
+                  <h4>🛍️ ショップ</h4>
+                  <p>現世のオンラインショップでアイテムを購入</p>
+                </div>
+                <div class="item-category">
+                  <h4>🔄 取引</h4>
+                  <p>異世界アイテムと現世通貨の交換</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="content-view ${this.currentTab === 'settings' ? 'active' : ''}" id="settings-view">
+            <div id="settings-container">
+              <h3>設定</h3>
+              <div class="settings-options">
+                <button class="btn btn--secondary">音量設定</button>
+                <button class="btn btn--secondary">オートセーブ設定</button>
+                <button class="btn btn--danger">データリセット</button>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div class="main-screen__characters" id="character-list-container">
-          <!-- キャラクターリストコンポーネントがここに配置される -->
-        </div>
       </div>
     `;
   }
@@ -47,35 +107,10 @@ export class MainScreenComponent implements UIComponent {
     if (characterContainer) {
       this.characterList = new CharacterListComponent(characterContainer);
       this.characterList.initialize();
-      
-      // ドラッグ開始イベントを設定
-      this.setupCharacterDragEvents();
     }
+
   }
 
-  private setupCharacterDragEvents(): void {
-    if (!this.characterList) return;
-
-    // キャラクターカードのドラッグ開始イベント
-    this.characterList.element.addEventListener('dragstart', (e) => {
-      const characterCard = (e.target as HTMLElement).closest('.character-card');
-      if (characterCard) {
-        const characterId = characterCard.getAttribute('data-character-id');
-        if (characterId) {
-          e.dataTransfer?.setData('text/plain', characterId);
-          characterCard.classList.add('dragging');
-        }
-      }
-    });
-
-    // ドラッグ終了
-    this.characterList.element.addEventListener('dragend', (e) => {
-      const characterCard = (e.target as HTMLElement).closest('.character-card');
-      if (characterCard) {
-        characterCard.classList.remove('dragging');
-      }
-    });
-  }
 
   private setupEventListeners(): void {
     // 時間関連イベント
@@ -91,6 +126,22 @@ export class MainScreenComponent implements UIComponent {
     this.eventBus.on(GameEvents.CHARACTER_STATUS_CHANGE, () => {
       this.update();
     });
+
+    // タブ切り替えイベント
+    this.eventBus.on('TAB_SWITCH', (data: any) => {
+      this.switchToTab(data.tabId);
+    });
+
+    // 建設ボタンのイベント
+    this.element.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('build-btn')) {
+        const buildingType = target.getAttribute('data-building');
+        if (buildingType) {
+          this.buildStructure(buildingType);
+        }
+      }
+    });
   }
 
   private processTeamWork(): void {
@@ -98,8 +149,37 @@ export class MainScreenComponent implements UIComponent {
     if (this.teamManagement) {
       // チーム作業の進行処理
       // 実際の実装は後で TeamManagementComponent で行う
-      console.log('Processing team work for 1 hour');
     }
+  }
+
+  private switchToTab(tabId: string): void {
+    this.currentTab = tabId;
+    
+    // すべてのビューを非表示
+    const views = this.element.querySelectorAll('.content-view');
+    views.forEach(view => view.classList.remove('active'));
+    
+    // 選択されたビューを表示
+    const activeView = this.element.querySelector(`#${tabId}-view`);
+    if (activeView) {
+      activeView.classList.add('active');
+    }
+  }
+
+  private buildStructure(buildingType: string): void {
+    // 拠点建設の実装
+    console.log(`Building: ${buildingType}`);
+    alert(`${this.getBuildingName(buildingType)}を建設しました！`);
+  }
+
+  private getBuildingName(buildingType: string): string {
+    const names: Record<string, string> = {
+      'house': '住居',
+      'kitchen': 'キッチン',
+      'workshop': '工房',
+      'clinic': '医務室'
+    };
+    return names[buildingType] || buildingType;
   }
 
   update(): void {

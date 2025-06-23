@@ -30,9 +30,9 @@ export class TeamManagementComponent implements UIComponent {
   }
 
   initialize(): void {
-    const gameManager = GameManager.getInstance();
-    this.characterSystem = gameManager.getSystem<CharacterSystem>('character') || null;
-    this.teamWorkSystem = gameManager.getSystem<TeamWorkSystem>('teamwork') || null;
+    const centralStateManager = CentralStateManager.getInstance();
+    this.characterSystem = centralStateManager.getSystem<CharacterSystem>('character') || null;
+    this.teamWorkSystem = centralStateManager.getSystem<TeamWorkSystem>('teamwork') || null;
     
     this.render();
     this.setupEventListeners();

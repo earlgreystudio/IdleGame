@@ -4,7 +4,7 @@ import type { GameTime } from '../../core/types/common';
 
 export class TimeSystem extends BaseSystem {
   private timeAccumulator: number = 0;
-  private readonly SECONDS_PER_HOUR: number = 60; // ゲーム内1時間 = 現実1分
+  private readonly SECONDS_PER_HOUR: number = 5; // ゲーム内1時間 = 現実5秒
   private readonly HOURS_PER_DAY: number = 24;
   private readonly DAYS_PER_SEASON: number = 30;
   private readonly SEASONS_PER_YEAR: number = 4;
@@ -33,7 +33,8 @@ export class TimeSystem extends BaseSystem {
   }
 
   protected onUpdate(deltaTime: number): void {
-    this.timeAccumulator += deltaTime;
+    // deltaTimeはミリ秒なので秒に変換
+    this.timeAccumulator += deltaTime / 1000;
     
     // 1ゲーム時間経過したか確認
     if (this.timeAccumulator >= this.SECONDS_PER_HOUR) {

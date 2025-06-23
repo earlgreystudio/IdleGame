@@ -13,7 +13,9 @@
       "Bash(rm:*)",
       "Bash(cp:*)",
       "Bash(grep:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(pkill:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": []
   }

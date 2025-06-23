@@ -113,6 +113,45 @@ export class DataManager {
   }
 
   /**
+   * 建物の指定レベルコスト取得
+   */
+  getBuildingCost(buildingType: BuildingType, level: number): Record<string, number> {
+    const template = this.getBuildingTemplate(buildingType);
+    const cost = template?.levels[level]?.cost || {};
+    const result: Record<string, number> = {};
+    
+    Object.entries(cost).forEach(([key, value]) => {
+      if (value !== undefined) {
+        result[key] = value;
+      }
+    });
+    
+    return result;
+  }
+
+  /**
+   * 建物のアップグレードコスト取得
+   */
+  getBuildingUpgradeCost(buildingType: BuildingType, currentLevel: number): Record<string, number> {
+    return this.getBuildingCost(buildingType, currentLevel + 1);
+  }
+
+  /**
+   * レベルデータ計算
+   */
+  calculateLevelData(buildingType: BuildingType, level: number): any {
+    return this.getBuildingLevelData(buildingType, level);
+  }
+
+  /**
+   * 建物効果取得
+   */
+  getBuildingEffect(buildingType: BuildingType, level: number): any {
+    const levelData = this.getBuildingLevelData(buildingType, level);
+    return levelData?.effect || {};
+  }
+
+  /**
    * 建物の指定レベルデータ取得
    */
   getBuildingLevelData(buildingType: BuildingType, level: number): any {

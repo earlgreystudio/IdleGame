@@ -111,7 +111,10 @@ export class CharacterFactory {
     intelligence: 5,
     dexterity: 5,
     agility: 5,
-    willpower: 5
+    willpower: 5,
+    constitution: 5,
+    charisma: 5,
+    luck: 5
   };
 
   static createCharacter(club: Club, gender: Gender, name?: string): Character {
@@ -128,6 +131,8 @@ export class CharacterFactory {
       name: characterName,
       gender,
       club,
+      level: 1,
+      experience: 0,
       status: {
         health: 100,
         stamina: 100,
@@ -136,7 +141,7 @@ export class CharacterFactory {
         thirst: 80
       },
       attributes,
-      skills,
+      skills: Object.fromEntries(skills) as Record<SkillType, CharacterSkill>,
       equipment: {
         chest: null,
         legs: null,
@@ -147,9 +152,9 @@ export class CharacterFactory {
         accessory2: null
       },
       currentTaskId: null,
-      taskQueue: [],
+      joinDate: Date.now(),
       createdAt: Date.now(),
-      potential
+      potential: Object.fromEntries(potential) as Record<SkillType, number>
     };
 
     return new Character(characterData);

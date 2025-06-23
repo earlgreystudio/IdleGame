@@ -17,8 +17,8 @@ export class CharacterListComponent implements UIComponent {
   }
 
   initialize(): void {
-    const gameManager = GameManager.getInstance();
-    this.characterSystem = gameManager.getSystem<CharacterSystem>('character') || null;
+    const centralStateManager = CentralStateManager.getInstance();
+    this.characterSystem = centralStateManager.getSystem<CharacterSystem>('character') || null;
     
     this.render();
     this.setupEventListeners();

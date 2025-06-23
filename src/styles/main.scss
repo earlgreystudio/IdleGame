@@ -88,6 +88,7 @@ body {
 .main {
   flex: 1;
   padding: $spacing-md;
+  padding-bottom: 80px; // ボトムバーの高さ分の余白
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -314,6 +315,15 @@ body {
   position: relative;
 }
 
+// フッター（ボトムバー）
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-index-modal;
+}
+
 .game-paused {
   &::after {
     content: "一時停止中";
@@ -416,7 +426,7 @@ body {
     color: $text-secondary;
   }
   
-  &__expand-btn {
+  &__detail-btn {
     background: none;
     border: none;
     color: $text-secondary;
@@ -429,10 +439,7 @@ body {
     &:hover {
       background-color: $bg-tertiary;
       color: $text-primary;
-    }
-    
-    &.expanded {
-      color: $primary-color;
+      transform: scale(1.1);
     }
   }
   
@@ -635,6 +642,17 @@ body {
   
   &--hidden {
     display: none;
+  }
+}
+
+// コンテンツビュー
+.content-view {
+  &:not(.active) {
+    display: none;
+  }
+  
+  &.active {
+    display: block;
   }
 }
 
@@ -862,3 +880,225 @@ body {
 
 // チーム管理スタイルをインポート
 @import 'team-management';
+
+// ボトムバー（ナビゲーション）
+.bottom-bar {
+  display: flex;
+  background-color: $bg-secondary;
+  border-top: 1px solid $border-color;
+  padding: $spacing-xs 0;
+  height: 70px;
+  
+  &__tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xs $spacing-sm;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: $transition-base;
+    color: $text-secondary;
+    
+    &:hover {
+      background-color: $bg-tertiary;
+    }
+    
+    &.active {
+      color: $primary-color;
+      
+      .tab-icon {
+        transform: scale(1.1);
+      }
+    }
+    
+    .tab-icon {
+      font-size: 1.5rem;
+      margin-bottom: $spacing-xs;
+      transition: transform 0.2s ease;
+    }
+    
+    .tab-label {
+      font-size: $font-size-xs;
+      font-weight: 500;
+    }
+  }
+}
+
+// アイテム画面のスタイル
+.item-categories {
+  display: grid;
+  gap: $spacing-md;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.item-category {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  padding: $spacing-md;
+  transition: $transition-base;
+  
+  &:hover {
+    border-color: $primary-color;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+  }
+  
+  h4 {
+    margin: 0 0 $spacing-sm 0;
+    color: $text-primary;
+    font-size: $font-size-lg;
+  }
+  
+  p {
+    margin: 0;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+  }
+}
+
+// キャラクター詳細モーダル
+.character-detail-modal {
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: $z-index-modal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-md;
+  }
+
+  .character-modal-content {
+    background-color: $bg-primary;
+    border-radius: $border-radius-lg;
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: $shadow-lg;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    border-bottom: 1px solid $border-color;
+    
+    h3 {
+      margin: 0;
+      color: $text-primary;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: $font-size-lg;
+      cursor: pointer;
+      color: $text-secondary;
+      padding: $spacing-xs;
+      
+      &:hover {
+        color: $text-primary;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: $spacing-md;
+  }
+
+  .character-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: $spacing-lg;
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .character-detail-section {
+    h4 {
+      margin: 0 0 $spacing-md 0;
+      color: $text-primary;
+      border-bottom: 1px solid $border-color;
+      padding-bottom: $spacing-sm;
+    }
+  }
+
+  .info-grid, .attribute-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-sm;
+  }
+
+  .info-item, .attribute-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-xs $spacing-sm;
+    background-color: $bg-secondary;
+    border-radius: $border-radius;
+    
+    .info-label, .attr-label {
+      color: $text-secondary;
+      font-size: $font-size-sm;
+    }
+    
+    .info-value, .attr-value {
+      color: $text-primary;
+      font-weight: 600;
+    }
+  }
+
+  .status-grid {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .skills-grid-modal {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: $spacing-xs;
+    
+    .skill-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing-xs;
+      background-color: $bg-tertiary;
+      border-radius: $border-radius;
+      font-size: $font-size-xs;
+      
+      .skill-name {
+        color: $text-secondary;
+      }
+      
+      .skill-level {
+        color: $primary-color;
+        font-weight: 600;
+      }
+    }
+    
+    .no-skills {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: $text-muted;
+      font-size: $font-size-xs;
+      padding: $spacing-sm;
+    }
+  }
+}

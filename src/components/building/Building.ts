@@ -1,4 +1,4 @@
-import type { BuildingData, BuildingType } from './types';
+import type { BuildingData, BuildingType, BuildingUpgrade, BuildingEffect } from './types';
 import type { Position } from '../../core/types/common';
 import { DataManager } from '../../utils/DataManager';
 import { EventBus, GameEvents } from '../../core/EventBus';

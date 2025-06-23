@@ -14,6 +14,7 @@ export class UIManager {
   private gameState: GameState;
   private components: Map<string, UIComponent> = new Map();
   private appElement: HTMLElement;
+  private updateTimeout: number | null = null;
 
   private constructor() {
     this.eventBus = EventBus.getInstance();
@@ -53,6 +54,7 @@ export class UIManager {
       <div class="game-container">
         <header id="game-header" class="header"></header>
         <main id="game-main" class="main"></main>
+        <footer id="game-footer" class="footer"></footer>
         <div id="modal-container"></div>
       </div>
     `;
@@ -87,9 +89,14 @@ export class UIManager {
   }
 
   updateComponents(): void {
-    for (const component of this.components.values()) {
-      component.update();
-    }
+    if (this.updateTimeout) return;
+    
+    this.updateTimeout = window.setTimeout(() => {
+      for (const component of this.components.values()) {
+        component.update();
+      }
+      this.updateTimeout = null;
+    }, 100); // 100msデバウンス
   }
 
   getHeaderElement(): HTMLElement {
@@ -114,6 +121,14 @@ export class UIManager {
       throw new Error('Modal container not found');
     }
     return modal;
+  }
+
+  getFooterElement(): HTMLElement {
+    const footer = document.getElementById('game-footer');
+    if (!footer) {
+      throw new Error('Footer element not found');
+    }
+    return footer;
   }
 
   showNotification(message: string, type: 'info' | 'success' | 'warning' | 'error' = 'info'): void {

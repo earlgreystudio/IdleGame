@@ -1,17 +1,16 @@
 import { UIComponent } from '@ui/UIManager';
-import { GameState } from '@core/GameState';
 import { TimeSystem } from '../../components/time/TimeSystem';
-import { GameManager } from '@core/GameManager';
+import { CentralStateManager } from '@core/CentralStateManager';
 
 export class HeaderComponent implements UIComponent {
   element: HTMLElement;
-  private gameState: GameState;
+  private centralStateManager: CentralStateManager;
   private timeDisplay: HTMLElement | null = null;
   private resourceDisplays: Map<string, HTMLElement> = new Map();
 
   constructor(element: HTMLElement) {
     this.element = element;
-    this.gameState = GameState.getInstance();
+    this.centralStateManager = CentralStateManager.getInstance();
   }
 
   initialize(): void {
@@ -43,7 +42,7 @@ export class HeaderComponent implements UIComponent {
     if (!container) return;
 
     const resourcesHtml: string[] = [];
-    const resources = this.gameState.resources;
+    const resources = this.centralStateManager.resources;
 
     // 主要リソースのみ表示
     const displayResources = ['yen', 'otherworld_currency', 'food', 'water', 'wood', 'stone', 'metal', 'wheat', 'wheatSeeds'];
@@ -112,8 +111,7 @@ export class HeaderComponent implements UIComponent {
   private updateTime(): void {
     if (!this.timeDisplay) return;
 
-    const gameManager = GameManager.getInstance();
-    const timeSystem = gameManager.getSystem<TimeSystem>('time');
+    const timeSystem = this.centralStateManager.getSystem<TimeSystem>('time');
     
     if (timeSystem) {
       this.timeDisplay.textContent = timeSystem.getFormattedTime();
@@ -121,7 +119,7 @@ export class HeaderComponent implements UIComponent {
   }
 
   private updateResources(): void {
-    const resources = this.gameState.resources;
+    const resources = this.centralStateManager.resources;
 
     this.resourceDisplays.forEach((element, resourceId) => {
       const resource = resources.get(resourceId);
@@ -137,7 +135,8 @@ export class HeaderComponent implements UIComponent {
     } else if (num >= 1000) {
       return (num / 1000).toFixed(1) + 'K';
     }
-    return num.toString();
+    // 小数点以下1桁まで表示、整数の場合は小数点なし
+    return Number(num.toFixed(1)).toString();
   }
 
   destroy(): void {

@@ -10,7 +10,7 @@ export class HeaderComponent implements UIComponent {
 
   constructor(element: HTMLElement) {
     this.element = element;
-    this.gameState = GameState.getInstance();
+    this.centralStateManager = CentralStateManager.getInstance();
   }
 
   initialize(): void {
@@ -42,7 +42,7 @@ export class HeaderComponent implements UIComponent {
     if (!container) return;
 
     const resourcesHtml: string[] = [];
-    const resources = this.gameState.resources;
+    const resources = this.centralStateManager.resources;
 
     // 主要リソースのみ表示
     const displayResources = ['yen', 'otherworld_currency', 'food', 'water', 'wood', 'stone', 'metal', 'wheat', 'wheatSeeds'];
@@ -111,8 +111,7 @@ export class HeaderComponent implements UIComponent {
   private updateTime(): void {
     if (!this.timeDisplay) return;
 
-    const gameManager = GameManager.getInstance();
-    const timeSystem = gameManager.getSystem<TimeSystem>('time');
+    const timeSystem = this.centralStateManager.getSystem<TimeSystem>('time');
     
     if (timeSystem) {
       this.timeDisplay.textContent = timeSystem.getFormattedTime();
@@ -120,7 +119,7 @@ export class HeaderComponent implements UIComponent {
   }
 
   private updateResources(): void {
-    const resources = this.gameState.resources;
+    const resources = this.centralStateManager.resources;
 
     this.resourceDisplays.forEach((element, resourceId) => {
       const resource = resources.get(resourceId);

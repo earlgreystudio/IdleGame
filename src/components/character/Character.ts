@@ -10,6 +10,9 @@ export class Character {
   public readonly gender: Gender;
   public readonly club: Club;
   public readonly createdAt: number;
+  public level: number;
+  public experience: number;
+  public readonly joinDate: number;
   
   private _status: CharacterStatus;
   private _attributes: CharacterAttributes;
@@ -28,12 +31,15 @@ export class Character {
     this.gender = data.gender;
     this.club = data.club;
     this.createdAt = data.createdAt;
+    this.level = data.level;
+    this.experience = data.experience;
+    this.joinDate = data.joinDate;
     
     this._status = { ...data.status };
     this._attributes = { ...data.attributes };
-    this._skills = new Map(data.skills);
+    this._skills = new Map(Object.entries(data.skills) as [SkillType, CharacterSkill][]);
     this._equipment = { ...data.equipment };
-    this._potential = new Map(data.potential);
+    this._potential = new Map(Object.entries(data.potential) as [SkillType, number][]);
   }
 
   // ゲッター
@@ -252,14 +258,16 @@ export class Character {
       name: this.name,
       gender: this.gender,
       club: this.club,
+      level: this.level,
+      experience: this.experience,
       status: { ...this._status },
       attributes: { ...this._attributes },
-      skills: new Map(this._skills),
+      skills: Object.fromEntries(this._skills) as Record<SkillType, CharacterSkill>,
       equipment: { ...this._equipment },
       currentTaskId: this.currentTaskId,
-      taskQueue: [...this.taskQueue],
+      joinDate: this.joinDate,
       createdAt: this.createdAt,
-      potential: new Map(this._potential)
+      potential: Object.fromEntries(this._potential) as Record<SkillType, number>
     };
   }
 }

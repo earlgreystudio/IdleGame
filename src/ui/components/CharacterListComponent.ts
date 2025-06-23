@@ -1,7 +1,7 @@
 import { UIComponent } from '@ui/UIManager';
-import { Character } from '@entities/Character';
+import { Character } from '../../components/character/Character';
 import { CharacterSystem } from '../../components/character/CharacterSystem';
-import { GameManager } from '@core/GameManager';
+import { CentralStateManager } from '@core/CentralStateManager';
 import { EventBus, GameEvents } from '@core/EventBus';
 
 export class CharacterListComponent implements UIComponent {
@@ -17,8 +17,8 @@ export class CharacterListComponent implements UIComponent {
   }
 
   initialize(): void {
-    const gameManager = GameManager.getInstance();
-    this.characterSystem = gameManager.getSystem<CharacterSystem>('character') || null;
+    const centralStateManager = CentralStateManager.getInstance();
+    this.characterSystem = centralStateManager.getSystem<CharacterSystem>('character') || null;
     
     this.render();
     this.setupEventListeners();
@@ -51,6 +51,61 @@ export class CharacterListComponent implements UIComponent {
         }
       });
     }
+
+    // イベント委譲でキャラクターカードのイベントを処理
+    this.element.addEventListener('click', (event) => {
+      console.log('BASIC TEST: Click detected on character list element');
+      const target = event.target as HTMLElement;
+      console.log('BASIC TEST: Target element:', target);
+      console.log('BASIC TEST: Target classes:', target.className);
+      console.log('BASIC TEST: Target tag:', target.tagName);
+      
+      // 詳細ボタンまたはその子要素をクリック
+      const detailBtn = target.closest('.character-card__detail-btn');
+      if (detailBtn) {
+        console.log('BASIC TEST: Detail button found!');
+        event.stopPropagation();
+        event.preventDefault();
+        
+        const characterId = detailBtn.getAttribute('data-character-id');
+        console.log('BASIC TEST: Character ID:', characterId);
+        
+        if (!characterId || !this.characterSystem) {
+          console.log('BASIC TEST: Missing characterId or characterSystem');
+          return;
+        }
+        
+        const character = this.characterSystem.getCharacter(characterId);
+        if (character) {
+          console.log('BASIC TEST: Opening modal for:', character.name);
+          this.showCharacterDetailModal(character);
+        }
+      }
+    });
+
+    // ドラッグイベント
+    this.element.addEventListener('dragstart', (event) => {
+      console.log('BASIC TEST: Drag started on character list element');
+      const target = event.target as HTMLElement;
+      console.log('BASIC TEST: Drag target:', target);
+      console.log('BASIC TEST: Drag target classes:', target.className);
+      
+      const characterCard = target.closest('.character-card');
+      console.log('BASIC TEST: Found character card:', characterCard);
+      
+      if (characterCard) {
+        const characterId = characterCard.getAttribute('data-character-id');
+        console.log('BASIC TEST: Character ID for drag:', characterId);
+        
+        if (characterId && this.characterSystem) {
+          const character = this.characterSystem.getCharacter(characterId);
+          if (character) {
+            console.log('BASIC TEST: Setting dragged character:', character.name);
+            (window as any).draggedCharacter = character;
+          }
+        }
+      }
+    });
 
     // キャラクター関連イベント
     this.eventBus.on(GameEvents.CHARACTER_SPAWN, () => {
@@ -90,8 +145,7 @@ export class CharacterListComponent implements UIComponent {
       this.renderCharacterCard(character)
     ).join('');
 
-    // キャラクターカードのイベントリスナーを設定
-    this.setupCharacterCardListeners();
+    // イベント委譲を使用しているため、ここでのリスナー設定は不要
   }
 
   private updateCharacterStatus(characterId: string): void {
@@ -141,7 +195,7 @@ export class CharacterListComponent implements UIComponent {
     });
   }
 
-  private renderCharacterCard(character: Character): string {
+  private renderCharacterCard(character: any): string {
     const status = character.status;
     const attributes = character.attributes;
     const isExpanded = this.expandedCharacters.has(character.id);
@@ -151,8 +205,8 @@ export class CharacterListComponent implements UIComponent {
         <div class="character-card__header">
           <div class="character-card__name-row">
             <span class="character-card__name">${character.name}</span>
-            <button class="character-card__expand-btn ${isExpanded ? 'expanded' : ''}" data-character-id="${character.id}">
-              ${isExpanded ? '×' : '⋯'}
+            <button class="character-card__detail-btn" data-character-id="${character.id}" onclick="console.log('INLINE TEST: Button clicked directly!', '${character.id}')">
+              📋
             </button>
           </div>
           <div class="character-card__meta-row">
@@ -180,88 +234,6 @@ export class CharacterListComponent implements UIComponent {
           }
         </div>
 
-        <div class="character-card__details" id="details-${character.id}" style="display: ${isExpanded ? 'block' : 'none'};">
-          <div class="character-details">
-            <div class="character-details__stats">
-              <div class="stat-item">
-                <span class="stat-label">攻撃</span>
-                <span class="stat-value">${character.attackPower}</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">防御</span>
-                <span class="stat-value">${character.defensePower}</span>
-              </div>
-            </div>
-
-            <div class="character-details__status">
-              <div class="status-detail">
-                <span class="status-label">体力</span>
-                <div class="progress progress--sm progress--health">
-                  <div class="progress__bar" style="width: ${status.health}%"></div>
-                </div>
-                <span class="status-value">${Math.round(status.health)}</span>
-              </div>
-              <div class="status-detail">
-                <span class="status-label">スタミナ</span>
-                <div class="progress progress--sm progress--stamina">
-                  <div class="progress__bar" style="width: ${status.stamina}%"></div>
-                </div>
-                <span class="status-value">${Math.round(status.stamina)}</span>
-              </div>
-              <div class="status-detail">
-                <span class="status-label">メンタル</span>
-                <div class="progress progress--sm progress--mental">
-                  <div class="progress__bar" style="width: ${status.mental}%"></div>
-                </div>
-                <span class="status-value">${Math.round(status.mental)}</span>
-              </div>
-              <div class="status-detail">
-                <span class="status-label">空腹</span>
-                <div class="progress progress--sm">
-                  <div class="progress__bar" style="width: ${status.hunger}%"></div>
-                </div>
-                <span class="status-value">${Math.round(status.hunger)}</span>
-              </div>
-              <div class="status-detail">
-                <span class="status-label">渇き</span>
-                <div class="progress progress--sm">
-                  <div class="progress__bar" style="width: ${status.thirst}%"></div>
-                </div>
-                <span class="status-value">${Math.round(status.thirst)}</span>
-              </div>
-            </div>
-
-            <div class="character-details__attributes">
-              <div class="attribute-grid-compact">
-                <div class="attribute-compact">
-                  <span>力</span><span>${attributes.strength}</span>
-                </div>
-                <div class="attribute-compact">
-                  <span>頑丈</span><span>${attributes.toughness}</span>
-                </div>
-                <div class="attribute-compact">
-                  <span>賢さ</span><span>${attributes.intelligence}</span>
-                </div>
-                <div class="attribute-compact">
-                  <span>器用</span><span>${attributes.dexterity}</span>
-                </div>
-                <div class="attribute-compact">
-                  <span>敏捷</span><span>${attributes.agility}</span>
-                </div>
-                <div class="attribute-compact">
-                  <span>精神</span><span>${attributes.willpower}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="character-details__skills">
-              <h5>主要スキル</h5>
-              <div class="skills-grid">
-                ${this.renderTopSkills(character)}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     `;
   }
@@ -282,41 +254,145 @@ export class CharacterListComponent implements UIComponent {
   }
 
   private setupCharacterCardListeners(): void {
-    // 展開ボタンのイベントリスナーを設定
-    const expandButtons = document.querySelectorAll('.character-card__expand-btn');
-    
-    expandButtons.forEach(button => {
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        event.preventDefault();
-        
-        const characterId = (button as HTMLElement).getAttribute('data-character-id');
-        if (!characterId) return;
-        
-        const detailsElement = document.getElementById(`details-${characterId}`);
-        const expandBtn = button as HTMLElement;
-        
-        if (detailsElement && expandBtn) {
-          const isCurrentlyExpanded = this.expandedCharacters.has(characterId);
-          
-          if (isCurrentlyExpanded) {
-            // 閉じる
-            this.expandedCharacters.delete(characterId);
-            detailsElement.style.display = 'none';
-            expandBtn.textContent = '⋯';
-            expandBtn.classList.remove('expanded');
-          } else {
-            // 開く
-            this.expandedCharacters.add(characterId);
-            detailsElement.style.display = 'block';
-            expandBtn.textContent = '×';
-            expandBtn.classList.add('expanded');
-          }
-        }
-      });
-    });
+    // イベント委譲を使用して、親要素に1回だけリスナーを設定
+    // これにより、動的に追加される要素にも対応可能
   }
 
+
+  private showCharacterDetailModal(character: Character): void {
+    const status = character.status;
+    const attributes = character.attributes;
+    
+    const modal = document.createElement('div');
+    modal.className = 'character-detail-modal';
+    modal.innerHTML = `
+      <div class="modal-overlay" id="character-modal-overlay">
+        <div class="modal-content character-modal-content">
+          <div class="modal-header">
+            <h3>${character.name}の詳細情報</h3>
+            <button class="modal-close" id="character-modal-close">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="character-detail-grid">
+              <div class="character-detail-section">
+                <h4>基本情報</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <span class="info-label">部活</span>
+                    <span class="info-value">${character.club}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">性別</span>
+                    <span class="info-value">${character.gender === 'male' ? '男性' : '女性'}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">攻撃力</span>
+                    <span class="info-value">${character.attackPower}</span>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">防御力</span>
+                    <span class="info-value">${character.defensePower}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="character-detail-section">
+                <h4>ステータス</h4>
+                <div class="status-grid">
+                  <div class="status-detail">
+                    <span class="status-label">体力</span>
+                    <div class="progress progress--sm progress--health">
+                      <div class="progress__bar" style="width: ${status.health}%"></div>
+                    </div>
+                    <span class="status-value">${Math.round(status.health)}</span>
+                  </div>
+                  <div class="status-detail">
+                    <span class="status-label">スタミナ</span>
+                    <div class="progress progress--sm progress--stamina">
+                      <div class="progress__bar" style="width: ${status.stamina}%"></div>
+                    </div>
+                    <span class="status-value">${Math.round(status.stamina)}</span>
+                  </div>
+                  <div class="status-detail">
+                    <span class="status-label">メンタル</span>
+                    <div class="progress progress--sm progress--mental">
+                      <div class="progress__bar" style="width: ${status.mental}%"></div>
+                    </div>
+                    <span class="status-value">${Math.round(status.mental)}</span>
+                  </div>
+                  <div class="status-detail">
+                    <span class="status-label">空腹</span>
+                    <div class="progress progress--sm">
+                      <div class="progress__bar" style="width: ${status.hunger}%"></div>
+                    </div>
+                    <span class="status-value">${Math.round(status.hunger)}</span>
+                  </div>
+                  <div class="status-detail">
+                    <span class="status-label">渇き</span>
+                    <div class="progress progress--sm">
+                      <div class="progress__bar" style="width: ${status.thirst}%"></div>
+                    </div>
+                    <span class="status-value">${Math.round(status.thirst)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="character-detail-section">
+                <h4>能力値</h4>
+                <div class="attribute-grid">
+                  <div class="attribute-item">
+                    <span class="attr-label">力</span>
+                    <span class="attr-value">${attributes.strength}</span>
+                  </div>
+                  <div class="attribute-item">
+                    <span class="attr-label">頑丈さ</span>
+                    <span class="attr-value">${attributes.toughness}</span>
+                  </div>
+                  <div class="attribute-item">
+                    <span class="attr-label">賢さ</span>
+                    <span class="attr-value">${attributes.intelligence}</span>
+                  </div>
+                  <div class="attribute-item">
+                    <span class="attr-label">器用さ</span>
+                    <span class="attr-value">${attributes.dexterity}</span>
+                  </div>
+                  <div class="attribute-item">
+                    <span class="attr-label">敏捷性</span>
+                    <span class="attr-value">${attributes.agility}</span>
+                  </div>
+                  <div class="attribute-item">
+                    <span class="attr-label">精神力</span>
+                    <span class="attr-value">${attributes.willpower}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="character-detail-section">
+                <h4>スキル</h4>
+                <div class="skills-grid-modal">
+                  ${this.renderTopSkills(character)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // モーダルイベントリスナー
+    const closeModal = () => {
+      document.body.removeChild(modal);
+    };
+
+    modal.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.id === 'character-modal-overlay' || target.id === 'character-modal-close') {
+        closeModal();
+      }
+    });
+  }
 
   private showSkillUpNotification(data: any): void {
     if (!this.characterSystem) return;
