@@ -1,0 +1,395 @@
+// チーム管理UI用スタイル
+
+.main-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 1rem;
+  gap: 1rem;
+
+  &__teams {
+    flex: 0 0 auto;
+    min-height: 400px;
+  }
+
+  &__characters {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+.team-management {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h2 {
+      margin: 0;
+      color: #2c3e50;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__task-assignment {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+
+    h3 {
+      margin: 0 0 1rem 0;
+      color: #495057;
+    }
+  }
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.team-slot {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+
+    .team-name-input {
+      background: transparent;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #2c3e50;
+      padding: 0.25rem;
+      border-radius: 4px;
+      flex: 1;
+
+      &:focus {
+        outline: none;
+        background: #f8f9fa;
+      }
+    }
+
+    .team-member-count {
+      background: #6c757d;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+  }
+
+  &__drop-zone {
+    min-height: 120px;
+    border: 2px dashed #dee2e6;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.empty {
+      background: #f8f9fa;
+    }
+
+    &.drag-over {
+      border-color: #007bff;
+      background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    .drop-placeholder {
+      text-align: center;
+      color: #6c757d;
+
+      &__icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+
+      &__text {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  &__status {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+.team-members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+  padding: 0.5rem;
+  min-width: 0;
+  position: relative;
+  cursor: grab;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #bbdefb;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &__avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #2196f3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  &__gender {
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1565c0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__stats {
+    display: flex;
+    gap: 1px;
+    margin-top: 2px;
+  }
+
+  &__remove {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: #f44336;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: none;
+
+    &:hover {
+      background: #d32f2f;
+    }
+  }
+
+  &:hover &__remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.stat-bar {
+  width: 20px;
+  height: 3px;
+  background: #eee;
+  border-radius: 1px;
+
+  &.health {
+    background: linear-gradient(to right, #4caf50 var(--width, 0%), #eee var(--width, 0%));
+  }
+
+  &.stamina {
+    background: linear-gradient(to right, #ff9800 var(--width, 0%), #eee var(--width, 0%));
+  }
+
+  &.mental {
+    background: linear-gradient(to right, #2196f3 var(--width, 0%), #eee var(--width, 0%));
+  }
+}
+
+.team-task-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+
+  .task-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #495057;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #28a745, #20c997);
+      transition: width 0.3s ease;
+    }
+  }
+
+  .stop-task-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+  }
+}
+
+.team-idle {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.task-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.task-category {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 1rem;
+
+  h4 {
+    margin: 0 0 0.75rem 0;
+    color: #495057;
+    font-size: 1rem;
+  }
+
+  .task-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+
+    &:hover {
+      background: #e9ecef;
+      border-color: #007bff;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// ドラッグ中のスタイル
+.character-card.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+.team-slot__drop-zone.drag-over {
+  border-color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+// ボタンスタイル
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &--primary {
+    background: #007bff;
+    color: white;
+
+    &:hover {
+      background: #0056b3;
+    }
+  }
+
+  &--secondary {
+    background: #6c757d;
+    color: white;
+
+    &:hover {
+      background: #545b62;
+    }
+  }
+
+  &--danger {
+    background: #dc3545;
+    color: white;
+
+    &:hover {
+      background: #c82333;
+    }
+  }
+
+  &--sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  &--xs {
+    padding: 0.125rem 0.25rem;
+    font-size: 0.7rem;
+  }
+}

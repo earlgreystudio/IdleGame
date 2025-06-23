@@ -1,0 +1,381 @@
+{
+  "buildings": {
+    "house": {
+      "id": "house",
+      "name": "家",
+      "description": "住人が住むための基本的な建物",
+      "category": "residential",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 100,
+        "upgradeDuration": 3600
+      },
+      "scaling": {
+        "cost": {
+          "wood": {
+            "formula": "base * level",
+            "base": 50
+          },
+          "stone": {
+            "formula": "base * level",
+            "base": 20
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.5)",
+          "base": 100
+        },
+        "effect": {
+          "capacity": {
+            "formula": "base + level",
+            "base": 1
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level",
+          "base": 3600
+        }
+      }
+    },
+    "farm": {
+      "id": "farm",
+      "name": "畑",
+      "description": "小麦を生産する畑",
+      "category": "production",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 80,
+        "upgradeDuration": 3600
+      },
+      "scaling": {
+        "cost": {
+          "wood": {
+            "formula": "base * level * level",
+            "base": 50
+          },
+          "wheatSeeds": {
+            "formula": "base * level",
+            "base": 1
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.4)",
+          "base": 80
+        },
+        "effect": {
+          "production": {
+            "resourceType": "wheat",
+            "rate": {
+              "formula": "base * level",
+              "base": 1
+            }
+          },
+          "storage": {
+            "formula": "base * level * 2",
+            "base": 50
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level",
+          "base": 3600
+        }
+      }
+    },
+    "well": {
+      "id": "well",
+      "name": "井戸",
+      "description": "水を供給する井戸",
+      "category": "production",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 150,
+        "upgradeDuration": 3600
+      },
+      "scaling": {
+        "cost": {
+          "stone": {
+            "formula": "base * level * level",
+            "base": 100
+          },
+          "metal": {
+            "formula": "base * level",
+            "base": 20
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.6)",
+          "base": 150
+        },
+        "effect": {
+          "production": {
+            "resourceType": "water",
+            "rate": {
+              "formula": "base * level",
+              "base": 2
+            }
+          },
+          "storage": {
+            "formula": "base * level * 3",
+            "base": 100
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level",
+          "base": 3600
+        }
+      }
+    },
+    "storage": {
+      "id": "storage",
+      "name": "倉庫",
+      "description": "リソースを保管する倉庫",
+      "category": "utility",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 120,
+        "upgradeDuration": 3600
+      },
+      "scaling": {
+        "cost": {
+          "wood": {
+            "formula": "base * level * level",
+            "base": 100
+          },
+          "stone": {
+            "formula": "base * level",
+            "base": 50
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.8)",
+          "base": 120
+        },
+        "effect": {
+          "storage": {
+            "formula": "base * level * level",
+            "base": 200
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level",
+          "base": 3600
+        }
+      }
+    },
+    "kitchen": {
+      "id": "kitchen",
+      "name": "キッチン",
+      "description": "食料を調理する施設",
+      "category": "utility",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 100,
+        "upgradeDuration": 3600
+      },
+      "scaling": {
+        "cost": {
+          "wood": {
+            "formula": "base * level",
+            "base": 80
+          },
+          "stone": {
+            "formula": "base * level",
+            "base": 40
+          },
+          "metal": {
+            "formula": "base * level",
+            "base": 30
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.5)",
+          "base": 100
+        },
+        "effect": {
+          "cookingSpeed": {
+            "formula": "1 + (base * level * 0.1)",
+            "base": 2
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level",
+          "base": 3600
+        }
+      }
+    },
+    "forge": {
+      "id": "forge",
+      "name": "鍛冶場",
+      "description": "道具や武器を作成する工房",
+      "category": "utility",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 120,
+        "upgradeDuration": 3600
+      },
+      "scaling": {
+        "cost": {
+          "stone": {
+            "formula": "base * level * level",
+            "base": 120
+          },
+          "metal": {
+            "formula": "base * level * level",
+            "base": 80
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.7)",
+          "base": 120
+        },
+        "effect": {
+          "craftingSpeed": {
+            "formula": "1 + (base * level * 0.1)",
+            "base": 3
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level",
+          "base": 3600
+        }
+      }
+    },
+    "fence": {
+      "id": "fence",
+      "name": "柵",
+      "description": "拠点の防御力を高める柵",
+      "category": "defense",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 80,
+        "upgradeDuration": 1800
+      },
+      "scaling": {
+        "cost": {
+          "wood": {
+            "formula": "base * level",
+            "base": 40
+          },
+          "stone": {
+            "formula": "base * level",
+            "base": 20
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.3)",
+          "base": 80
+        },
+        "effect": {
+          "defense": {
+            "formula": "base * level",
+            "base": 5
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level * 0.5",
+          "base": 1800
+        }
+      }
+    },
+    "watchtower": {
+      "id": "watchtower",
+      "name": "監視塔",
+      "description": "敵の襲撃を早期発見する監視塔",
+      "category": "defense",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 150,
+        "upgradeDuration": 3600
+      },
+      "scaling": {
+        "cost": {
+          "wood": {
+            "formula": "base * level * level",
+            "base": 100
+          },
+          "stone": {
+            "formula": "base * level * level",
+            "base": 80
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.5)",
+          "base": 150
+        },
+        "effect": {
+          "earlyWarning": {
+            "formula": "Math.floor(base * Math.log(level + 1))",
+            "base": 2
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level",
+          "base": 3600
+        }
+      }
+    },
+    "trap": {
+      "id": "trap",
+      "name": "罠",
+      "description": "侵入者に自動でダメージを与える罠",
+      "category": "defense",
+      "maxLevel": 100,
+      "baseStats": {
+        "health": 60,
+        "upgradeDuration": 1800
+      },
+      "scaling": {
+        "cost": {
+          "wood": {
+            "formula": "base * level",
+            "base": 60
+          },
+          "metal": {
+            "formula": "base * level",
+            "base": 40
+          }
+        },
+        "health": {
+          "formula": "base * (1 + level * 0.2)",
+          "base": 60
+        },
+        "effect": {
+          "trapDamage": {
+            "formula": "base * level * 2",
+            "base": 15
+          }
+        },
+        "upgradeDuration": {
+          "formula": "base * level * 0.5",
+          "base": 1800
+        }
+      }
+    }
+  },
+  "categories": {
+    "residential": {
+      "name": "住居",
+      "description": "住人が住むための建物"
+    },
+    "production": {
+      "name": "生産",
+      "description": "リソースを生産する建物"
+    },
+    "utility": {
+      "name": "施設",
+      "description": "特殊効果を提供する建物"
+    },
+    "defense": {
+      "name": "防御",
+      "description": "拠点を守るための建物"
+    }
+  },
+  "formulaExamples": {
+    "linear": "base * level",
+    "quadratic": "base * level * level", 
+    "logarithmic": "base * Math.log(level + 1)",
+    "exponential": "base * Math.pow(1.1, level)",
+    "multiplier": "1 + (base * level * 0.1)",
+    "stepwise": "Math.floor(base * level / 5) * 5"
+  }
+}

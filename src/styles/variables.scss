@@ -1,0 +1,74 @@
+// カラーパレット
+$primary-color: #4a90e2;
+$secondary-color: #7b68ee;
+$success-color: #5cb85c;
+$warning-color: #f0ad4e;
+$danger-color: #d9534f;
+$info-color: #5bc0de;
+
+// グレースケール
+$white: #ffffff;
+$gray-100: #f8f9fa;
+$gray-200: #e9ecef;
+$gray-300: #dee2e6;
+$gray-400: #ced4da;
+$gray-500: #adb5bd;
+$gray-600: #6c757d;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000000;
+
+// 背景色
+$bg-primary: $gray-900;
+$bg-secondary: $gray-800;
+$bg-tertiary: $gray-700;
+
+// テキスト色
+$text-primary: $gray-100;
+$text-secondary: $gray-400;
+$text-muted: $gray-500;
+
+// フォント
+$font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+$font-family-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+
+// フォントサイズ
+$font-size-base: 16px;
+$font-size-sm: 14px;
+$font-size-xs: 12px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+
+// 間隔
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// ボーダー
+$border-radius: 4px;
+$border-radius-lg: 8px;
+$border-color: $gray-700;
+
+// シャドウ
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+// トランジション
+$transition-base: all 0.2s ease-in-out;
+$transition-fast: all 0.1s ease-in-out;
+
+// ブレークポイント（モバイルファースト）
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+
+// Z-index
+$z-index-dropdown: 1000;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;

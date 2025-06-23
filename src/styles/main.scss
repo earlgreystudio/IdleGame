@@ -1,0 +1,864 @@
+// リセットCSS
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: $font-size-base;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-family-base;
+  background-color: $bg-primary;
+  color: $text-primary;
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+  
+  // モバイル用の設定
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// アプリケーションコンテナ
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+// ヘッダースタイル
+.header {
+  position: sticky;
+  top: 0;
+  z-index: $z-index-dropdown;
+  background-color: $bg-secondary;
+  border-bottom: 1px solid $border-color;
+  padding: $spacing-sm $spacing-md;
+  
+  &__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  &__resources {
+    display: flex;
+    gap: $spacing-md;
+    flex-wrap: wrap;
+  }
+  
+  &__time {
+    font-family: $font-family-mono;
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+}
+
+// リソース表示
+.resource {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  
+  &__icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  &__amount {
+    font-family: $font-family-mono;
+    font-weight: 600;
+  }
+  
+  &--primary {
+    color: $primary-color;
+  }
+  
+  &--secondary {
+    color: $secondary-color;
+  }
+}
+
+// メインコンテンツ
+.main {
+  flex: 1;
+  padding: $spacing-md;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+// ボタン
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-md;
+  border: none;
+  border-radius: $border-radius;
+  font-size: $font-size-base;
+  font-weight: 500;
+  cursor: pointer;
+  transition: $transition-base;
+  text-decoration: none;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  &--primary {
+    background-color: $primary-color;
+    color: $white;
+    
+    &:hover:not(:disabled) {
+      background-color: darken($primary-color, 10%);
+    }
+  }
+  
+  &--secondary {
+    background-color: $gray-700;
+    color: $text-primary;
+    
+    &:hover:not(:disabled) {
+      background-color: $gray-600;
+    }
+  }
+  
+  &--sm {
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-sm;
+  }
+  
+  &--lg {
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-lg;
+  }
+  
+  &--block {
+    width: 100%;
+  }
+}
+
+// カード
+.card {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-color;
+  }
+  
+  &__title {
+    font-size: $font-size-lg;
+    font-weight: 600;
+  }
+  
+  &__body {
+    color: $text-secondary;
+  }
+}
+
+// プログレスバー
+.progress {
+  height: 20px;
+  background-color: #495057; // グレー背景を直接指定
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #6c757d;
+  
+  &__bar {
+    height: 100%;
+    background-color: $primary-color;
+    transition: width 0.3s ease;
+    min-width: 2px; // 最小幅を確保
+  }
+  
+  &--sm {
+    height: 8px;
+  }
+  
+  &--xs {
+    height: 6px;
+    border-radius: 3px;
+  }
+  
+  &--health {
+    .progress__bar {
+      background-color: #d9534f !important; // 赤
+    }
+  }
+  
+  &--stamina {
+    .progress__bar {
+      background-color: #f0ad4e !important; // 黄
+    }
+  }
+  
+  &--mental {
+    .progress__bar {
+      background-color: #5bc0de !important; // 青
+    }
+  }
+}
+
+// ユーティリティクラス
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: $text-muted; }
+.text-small { font-size: $font-size-sm; }
+
+.mt-1 { margin-top: $spacing-xs; }
+.mt-2 { margin-top: $spacing-sm; }
+.mt-3 { margin-top: $spacing-md; }
+.mt-4 { margin-top: $spacing-lg; }
+
+.mb-1 { margin-bottom: $spacing-xs; }
+.mb-2 { margin-bottom: $spacing-sm; }
+.mb-3 { margin-bottom: $spacing-md; }
+.mb-4 { margin-bottom: $spacing-lg; }
+
+.p-1 { padding: $spacing-xs; }
+.p-2 { padding: $spacing-sm; }
+.p-3 { padding: $spacing-md; }
+.p-4 { padding: $spacing-lg; }
+
+// アイコン（絵文字を使用）
+.resource__icon {
+  display: inline-block;
+  width: 1.2em;
+  text-align: center;
+  
+  &.icon-yen::before { content: "💴"; }
+  &.icon-coin::before { content: "🪙"; }
+  &.icon-food::before { content: "🍖"; }
+  &.icon-water::before { content: "💧"; }
+  &.icon-wood::before { content: "🪵"; }
+  &.icon-stone::before { content: "🪨"; }
+  &.icon-metal::before { content: "⚙️"; }
+  &.icon-wheat::before { content: "🌾"; }
+  &.icon-seeds::before { content: "🌱"; }
+  &.icon-default::before { content: "📦"; }
+}
+
+// 通知
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  max-width: 300px;
+  padding: $spacing-md;
+  border-radius: $border-radius;
+  background-color: $bg-secondary;
+  color: $text-primary;
+  box-shadow: $shadow-lg;
+  z-index: $z-index-tooltip;
+  animation: slideIn 0.3s ease-out;
+  
+  &--info {
+    border-left: 4px solid $info-color;
+  }
+  
+  &--success {
+    border-left: 4px solid $success-color;
+  }
+  
+  &--warning {
+    border-left: 4px solid $warning-color;
+  }
+  
+  &--error {
+    border-left: 4px solid $danger-color;
+  }
+  
+  &--fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+// ゲーム固有のスタイル
+.game-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.game-paused {
+  &::after {
+    content: "一時停止中";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: $white;
+    background-color: rgba($black, 0.8);
+    padding: $spacing-lg;
+    border-radius: $border-radius-lg;
+    z-index: $z-index-modal;
+  }
+}
+
+// キャラクター関連スタイル
+.character-list {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    
+    h3 {
+      margin: 0;
+      color: $text-primary;
+    }
+  }
+  
+  &__content {
+    display: grid;
+    gap: $spacing-sm;
+    grid-template-columns: repeat(auto-fill, 180px);
+    justify-content: start;
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: repeat(auto-fill, 160px);
+      gap: $spacing-xs;
+    }
+  }
+}
+
+.character-card {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  padding: $spacing-sm;
+  transition: $transition-base;
+  width: 180px;
+  
+  @media (max-width: $breakpoint-sm) {
+    width: 160px;
+  }
+  
+  &:hover {
+    border-color: $primary-color;
+  }
+  
+  &__header {
+    margin-bottom: $spacing-xs;
+  }
+  
+  &__name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+  
+  &__meta-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+  
+  &__name {
+    font-size: $font-size-base;
+    color: $text-primary;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+  
+  &__club {
+    display: inline-block;
+    padding: 2px $spacing-xs;
+    background-color: $primary-color;
+    color: $white;
+    font-size: 10px;
+    border-radius: 2px;
+    margin-right: $spacing-xs;
+  }
+  
+  &__gender {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+  
+  &__expand-btn {
+    background: none;
+    border: none;
+    color: $text-secondary;
+    font-size: $font-size-lg;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: $transition-fast;
+    
+    &:hover {
+      background-color: $bg-tertiary;
+      color: $text-primary;
+    }
+    
+    &.expanded {
+      color: $primary-color;
+    }
+  }
+  
+  &__status {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: $spacing-xs;
+  }
+  
+  &__task-status {
+    text-align: center;
+  }
+  
+  &__details {
+    margin-top: $spacing-sm;
+    padding-top: $spacing-sm;
+    border-top: 1px solid $border-color;
+    animation: slideDown 0.2s ease-out;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+.task-status {
+  font-size: $font-size-xs;
+  padding: 2px $spacing-xs;
+  border-radius: 2px;
+  
+  &--active {
+    background-color: $success-color;
+    color: $white;
+  }
+  
+  &--idle {
+    background-color: $gray-600;
+    color: $text-secondary;
+  }
+}
+
+// 詳細エリア
+.character-details {
+  &__stats {
+    display: flex;
+    gap: $spacing-md;
+    margin-bottom: $spacing-sm;
+  }
+  
+  &__status {
+    margin-bottom: $spacing-sm;
+  }
+  
+  &__attributes {
+    margin-bottom: $spacing-sm;
+  }
+  
+  &__skills {
+    h5 {
+      margin: 0 0 $spacing-xs 0;
+      font-size: $font-size-sm;
+      color: $text-primary;
+    }
+  }
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  .stat-label {
+    font-size: $font-size-xs;
+    color: $text-secondary;
+  }
+  
+  .stat-value {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $text-primary;
+  }
+}
+
+.status-detail {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xs;
+  
+  .status-label {
+    min-width: 60px;
+    font-size: $font-size-xs;
+    color: $text-secondary;
+  }
+  
+  .progress {
+    flex: 1;
+  }
+  
+  .status-value {
+    min-width: 30px;
+    text-align: right;
+    font-size: $font-size-xs;
+    font-family: $font-family-mono;
+    color: $text-secondary;
+  }
+}
+
+.attribute-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xs;
+}
+
+.attribute-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs;
+  background-color: $bg-tertiary;
+  border-radius: $border-radius;
+  font-size: $font-size-xs;
+  
+  span:first-child {
+    color: $text-secondary;
+  }
+  
+  span:last-child {
+    color: $text-primary;
+    font-weight: 600;
+  }
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-xs;
+}
+
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs;
+  background-color: $bg-tertiary;
+  border-radius: $border-radius;
+  font-size: $font-size-xs;
+  
+  .skill-name {
+    color: $text-secondary;
+  }
+  
+  .skill-level {
+    color: $primary-color;
+    font-weight: 600;
+  }
+}
+
+.no-skills {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: $text-muted;
+  font-size: $font-size-xs;
+  padding: $spacing-sm;
+}
+
+
+// ナビゲーション
+.main-nav {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  padding: $spacing-sm;
+  background-color: $bg-secondary;
+  border-radius: $border-radius;
+  border: 1px solid $border-color;
+  
+  .nav-btn {
+    min-width: 80px;
+  }
+}
+
+// ビューコンテナ
+.view-container {
+  position: relative;
+}
+
+.view-content {
+  &--active {
+    display: block;
+  }
+  
+  &--hidden {
+    display: none;
+  }
+}
+
+// 拠点関連スタイル
+.base-view {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    
+    h3 {
+      margin: 0;
+      color: $text-primary;
+    }
+  }
+  
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+  
+  &__buildings {
+    display: grid;
+    gap: $spacing-sm;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  &__construction {
+    h4 {
+      margin: 0 0 $spacing-md 0;
+      color: $text-primary;
+    }
+  }
+}
+
+.building-card {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  padding: $spacing-md;
+  
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-sm;
+  }
+  
+  &__info {
+    flex: 1;
+  }
+  
+  &__name {
+    font-size: $font-size-base;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 $spacing-xs 0;
+  }
+  
+  &__position {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+  }
+  
+  &__health {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: $spacing-xs;
+    min-width: 100px;
+    
+    .health-text {
+      font-size: $font-size-xs;
+      color: $text-secondary;
+      font-family: $font-family-mono;
+    }
+  }
+  
+  &__upgrade {
+    margin-bottom: $spacing-sm;
+    padding: $spacing-sm;
+    background-color: $bg-tertiary;
+    border-radius: $border-radius;
+    
+    .upgrade-text {
+      font-size: $font-size-sm;
+      color: $text-primary;
+      display: block;
+      margin-bottom: $spacing-xs;
+    }
+  }
+  
+  &__production {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+    padding: $spacing-sm;
+    background-color: $bg-tertiary;
+    border-radius: $border-radius;
+    
+    .production-text {
+      font-size: $font-size-sm;
+      color: $text-primary;
+      font-family: $font-family-mono;
+    }
+  }
+  
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+    justify-content: flex-end;
+  }
+}
+
+.construction-grid {
+  display: grid;
+  gap: $spacing-md;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.construction-item {
+  background-color: $bg-secondary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  padding: $spacing-md;
+  transition: $transition-base;
+  
+  &:hover:not(&--disabled) {
+    border-color: $primary-color;
+  }
+  
+  &--disabled {
+    opacity: 0.6;
+    
+    .construction-btn {
+      cursor: not-allowed;
+    }
+  }
+  
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-sm;
+    
+    h6 {
+      margin: 0;
+      font-size: $font-size-base;
+      color: $text-primary;
+    }
+  }
+  
+  &__cost {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    
+    .cost-item {
+      font-size: $font-size-xs;
+      color: $text-secondary;
+      font-family: $font-family-mono;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+  }
+  
+  &__description {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    margin: 0 0 $spacing-md 0;
+    line-height: 1.4;
+  }
+}
+
+// ボタンスタイルの追加
+.btn {
+  &--xs {
+    padding: $spacing-xs * 0.5 $spacing-xs;
+    font-size: $font-size-xs;
+  }
+  
+  &--danger {
+    background-color: $danger-color;
+    color: $white;
+    
+    &:hover:not(:disabled) {
+      background-color: darken($danger-color, 10%);
+    }
+  }
+  
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// プログレスバーの追加スタイル
+.progress {
+  &--xs {
+    height: 4px;
+    border-radius: 2px;
+  }
+}
+
+// レスポンシブユーティリティ
+@media (min-width: $breakpoint-md) {
+  .hide-md-up { display: none !important; }
+}
+
+@media (max-width: $breakpoint-md - 1px) {
+  .hide-md-down { display: none !important; }
+}
+
+// チーム管理スタイルをインポート
+@import 'team-management';
